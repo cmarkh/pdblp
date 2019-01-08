@@ -305,9 +305,9 @@ class BCon(object):
         for msg in self._receive_events():
             d = msg['element']['HistoricalDataResponse']
             has_security_error = 'securityError' in d['securityData']
-            has_field_exception = len(d['securityData']['fieldExceptions']) > 0
-            if has_security_error or has_field_exception:
-                raise ValueError(data)
+            # has_field_exception = len(d['securityData']['fieldExceptions']) > 0
+            # if has_security_error or has_field_exception:
+                # raise ValueError(data)
             ticker = d['securityData']['security']
             fldDatas = d['securityData']['fieldData']
             for fd in fldDatas:
@@ -378,17 +378,20 @@ class BCon(object):
             for security_data_dict in d:
                 secData = security_data_dict['securityData']
                 ticker = secData['security']
-                if 'securityError' in secData:
-                    raise ValueError('Unknow security {!r}'.format(ticker))
-                self._check_fieldExceptions(secData['fieldExceptions'])
+                # if 'securityError' in secData:
+                    # raise ValueError('Unknow security {!r}'.format(ticker))
+                # self._check_fieldExceptions(secData['fieldExceptions'])
                 fieldData = secData['fieldData']['fieldData']
                 for fld in flds:
                     # avoid returning nested bbg objects, fail instead
                     # since user should use bulkref()
                     if (fld in fieldData) and isinstance(fieldData[fld], list):
-                        raise ValueError('Field {!r} returns bulk reference '
-                                         'data which is not supported'
-                                         .format(fld))
+                        #raise ValueError('Field {!r} returns bulk reference '
+                                         #'data which is not supported'
+                                         #.format(fld))
+                        datum = [ticker, fld, np.NaN]
+                        datum.extend(corrId)
+                        data.append(datum)
                     # this is a slight hack but if a fieldData response
                     # does not have the element fld and this is not a bad
                     # field (which is checked above) then the assumption is
